@@ -12,9 +12,11 @@ Access to IDRIS’s GPU clusters enables **simple, efficient, and reproducible**
 
 ## ✅ Conclusion
 
-In a realistic Instruct Fine-Tuning scenario using a limited surface of **64 GPUs**, with dense LLMs up to **72B parameters** (no Mixture-of-Experts) and a **4096 context length**, and assuming pretrained weights loaded directly from the **Hugging Face Hub**, we conclude that the **PyTorch FSDP2 + selective activation checkpointing + `torch.compile`** workflow offers the **best balance of performance, flexibility, clarity, and portability**.  
+In a realistic Instruct Fine-Tuning scenario using a limited surface of **64 GPUs**, with dense LLMs up to **72B parameters** (no Mixture-of-Experts) and a **4096 context length**, and assuming pretrained weights loaded directly from the **Hugging Face Hub**, we conclude that the **PyTorch FSDP2 + selective activation checkpointing + `torch.compile`** workflow offers the **best balance of performance, flexibility, clarity, and portability**.
 
 This conclusion holds **only when GPUs provide sufficient memory (≥ 80 GB)** and are connected through a **high-bandwidth interconnect**. Under these conditions, the approach remains fully open, easy to configure, and deployable across heterogeneous systems, making it the most practical and robust solution for large-scale SFT workloads within this resource envelope.
+
+In this context, adding **tensor parallelism** increases operational complexity without delivering meaningful benefits. Introducing **pipeline parallelism** makes the workflow even more complex, as it requires redefining the model architecture and injecting pretrained weights across multiple shards. By contrast, **FSDP/FSDP2 handles sharding transparently**, making large-scale training feel almost seamless. However, FSDP alone becomes limiting when scaling to **very large GPU counts** driven by extreme model sizes or full **pre-training workloads**, where more advanced parallelism strategies may become necessary.
 
 
 ## Points d'intérêts et de discussion
