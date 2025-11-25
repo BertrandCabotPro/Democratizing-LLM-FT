@@ -81,7 +81,38 @@ for param in model.parameters(recurse=False):
 model.reshard()
 ```
 
+## 📦 Loading the Model from the Hugging Face Hub
 
+Models are loaded from the **Hugging Face Hub** using the standard API:
+
+```python
+from transformers import AutoModelForCausalLM
+
+model = AutoModelForCausalLM.from_pretrained(
+    model_path,
+    torch_dtype="bfloat16",
+)
+
+For large models in the tens of billions of parameters, memory pressure appears at two stages:
+
+1. On GPU: a full BF16 or FP32 copy can easily exceed device memory if parameters are not sharded early.
+
+2. On CPU: naïvely casting the whole model to float32 or loading directly in float32 causes the entire parameter set to reside in host RAM at once, which frequently leads to CPU OOM.
+
+The .from_pretrained method is relatively CPU-memory efficient when loading the model in its original precision (often BF16), because it streams weights without duplicating them unnecessarily. However, FSDP2 mixed precision expects parameters to be managed internally in float32 (with compute typically in BF16), which creates a tension:
+
+Casting on CPU → large, temporary FP32 copy in host RAM → high risk of OOM
+
+Casting on GPU → large FP32 footprint before sharding → high risk of OOM as well
+
+To resolve this, we cast to FP32 while sharding, layer by layer:
+
+```python
+for layer in model.model.layers:
+    fully_shard(layer.type(torch.float32), **fsdp_kwargs)
+fully_shard(model.type(torch.float32), **fsdp_kwargs)
+```
+This pattern preserves **CPU and GPU memory** by avoiding a global FP32 copy of the model in RAM. The trade-off is a **non-negligible casting time overhead** (on the order of 100 to 1000 seconds, depending on model size and hardware), but it keeps the loading process feasible for very large models without hitting CPU or GPU out-of-memory errors.
 
 
 ## Points d'intérêts et de discussion
