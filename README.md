@@ -193,6 +193,11 @@ To avoid paying this cost for every fine-tuning run, you can:
 
 This workflow reduces startup time from **minutes** to **seconds**, avoids repeated casting overhead, and ensures you always start from the exact pretrained weights.
 
+###  FSDP2 Optimizer Checkpointing — Saving & Loading with Distributed Checkpoint (DCP)
+In FSDP2, **optimizer states are sharded across GPUs**, just like model parameters.  
+The Distributed Checkpoint (DCP) APIs make it possible to save and reload these sharded optimizer states efficiently, without requiring full consolidation on a single machine.
+Refer to [pytorch/examples](https://github.com/pytorch/examples/blob/main/distributed/FSDP2/checkpoint.py) for loading and saving optimizer state dicts with `set_optimizer_state_dict` and `get_optimizer_state_dict`.
+
 ## Containers vs. Modules — Practical Observations
 
 For portability and reproducibility across heterogeneous systems, we chose to rely on an NGC container image (`nemo-25.09`) rather than environment modules. In practice, the container setup proved **significantly more performant** than the `module` environment for this heavily distributed workload, particularly due to more consistent CUDA/NCCL integration.
