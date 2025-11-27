@@ -153,6 +153,7 @@ This properly rehydrates the sharded model across all devices.
 ### Optimization Tip: Avoid Recasting & Re-Sharding on Every Run
 
 As described earlier, casting the model to **FP32** and **sharding it layer-by-layer** with FSDP2 can take 100–1000 seconds, especially for 30B–70B models.
+
 To avoid this overhead for each experiment starting from the same pretrained weights and the same distributed/sharding configuration, you can:
 1. Load the pretrained model from the HF Hub in BF16
 2. Cast + shard layer-by-layer with FSDP2 (memory-safe approach)
