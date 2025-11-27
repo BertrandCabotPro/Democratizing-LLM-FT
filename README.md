@@ -17,7 +17,7 @@ Future work will extend this democratization to **Mixture-of-Experts training** 
 Our realistic Instruct Fine-Tuning scenario follows the setup described in [Tulu 3: Pushing Frontiers in Open Language Model Post-Training (2024)](https://arxiv.org/abs/2411.15124).
 
 Here is the [detailed code review](doc/CODE_REVIEW.md).
----
+
 
 ## ✅ Conclusion
 
