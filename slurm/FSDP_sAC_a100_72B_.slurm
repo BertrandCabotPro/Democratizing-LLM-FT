@@ -36,6 +36,6 @@ set -x
 #time srun python -u FSDP_sAC.py --test --model Qwen/Qwen2.5-72B-Instruct --sac 7/8 --bsz 2 --grad-acc 1 --compile
 time srun singularity exec --nv --bind $SINGULARITY_BINDPATH \
     $SINGULARITY_ALLOWED_DIR/nemo2506_amd.sif \
-    python FSDP_sAC.py --test --model Qwen/Qwen2.5-72B-Instruct --sac 1 --bsz 2 --grad-acc 1 --cpu-usage --low-cpu-ram --compile
+    python FSDP_sAC.py --test --model Qwen/Qwen2.5-72B-Instruct --sac 1 --bsz 2 --grad-acc 1 --cpu-usage --compile
 
 date

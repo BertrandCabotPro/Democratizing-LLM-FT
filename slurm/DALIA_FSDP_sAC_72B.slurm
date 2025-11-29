@@ -30,5 +30,5 @@ ulimit -s 8192
 set -x
 time srun apptainer exec --nv \
     $WORK/nemo2506_arm.sif \
-    python $MYWORK/FSDP_sAC.py --test --model Qwen/Qwen2.5-72B-Instruct --sac 1/2 --bsz 2 --grad-acc 1 --cpu-usage --low-cpu-ram --compile
+    python $MYWORK/FSDP_sAC.py --test --model Qwen/Qwen2.5-72B-Instruct --sac 1/2 --bsz 2 --grad-acc 1 --cpu-usage --compile
 date

@@ -77,8 +77,7 @@ def parse_args() -> Namespace:
                         default=None,
                         type=str,
                         help='For a given ac ratio p, we should essentially apply ac on every "1/p" blocks.')
-    parser.add_argument('--low-cpu-ram', default=False, action='store_true', help='Economy mode for CPU RAM - casting is done during the sharding.')
-
+    
     return parser.parse_args()
 
 
@@ -118,10 +117,7 @@ dataset_path = "/lustre/fswork/dataset/tulu-3-sft-mixture/data"
 
 #### Initialize the model and its tokenizer
 if RANK == 0: chrono.tac_time(clear=True)
-if args.low_cpu_ram:
-    model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype="bfloat16")
-else:
-    model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype="float32")
+model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype="bfloat16", trust_remote_code=True)
 num_parameters = sum(param.numel() for param in model.parameters())
 tokenizer = AutoTokenizer.from_pretrained(str(model_path), padding_side="left")
 if RANK == 0: print(f"Time to load and initialize the model and its tokenizer: {chrono.tac_time():.3f}s")
@@ -142,15 +138,9 @@ fsdp_kwargs["mp_policy"] = MixedPrecisionPolicy(
             reduce_dtype=torch.float32,
         )
 
-if args.low_cpu_ram:
-    for layer in model.model.layers:
-        fully_shard(layer.type(torch.float32), **fsdp_kwargs)
-    fully_shard(model.type(torch.float32), **fsdp_kwargs)
-
-else:
-    for layer in model.model.layers:
-        fully_shard(layer, **fsdp_kwargs)
-    fully_shard(model, **fsdp_kwargs)
+for layer in model.model.layers:
+    fully_shard(layer.type(torch.float32), **fsdp_kwargs)
+fully_shard(model.type(torch.float32), **fsdp_kwargs)
 
 if RANK == 0: print(f"Time to shard the model: {chrono.tac_time():.3f}s")
 
@@ -294,6 +284,8 @@ for epoch in range(args.epochs):
                 print(f"Step {step} / {args.test_nsteps if args.test else len(dataloader) // args.grad_acc} | Loss: {L.item():.3f} | Perplexity: {perp.item():.3f} | LR: {last_lr:0.3e} | Wall: {chrono.tac_time():.3f}")
     
         if args.test: chrono.dataload()
+
+        if i==1 and RANK == 0: print(f"Time to first step - compile Graph Building: {chrono.tac_time():.3f}s")
 ####
 
     ######### Model Checkpointing at each epoch ############
