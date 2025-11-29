@@ -3,7 +3,7 @@
 #SBATCH --output=logs/out/DALIA_NeMo_FSDP_TP_14B_%j.out 
 #SBATCH --error=logs/err/DALIA_NeMo_FSDP_TP_14B_%j.err
 #SBATCH --gpus-per-node=4
-#SBATCH --nodes=8
+#SBATCH --nodes=16
 #SBATCH --ntasks-per-node=4 
 #SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=36 
@@ -35,11 +35,10 @@ time srun apptainer exec --nv \
                              --use-te-optimizer \
                              --strategy fsdp2 \
                              --devices 4 \
-                             --num-nodes 8 \
+                             --num-nodes 16 \
                              --tp-size 4 \
                              --cp-size 1 \
                              --batch-size 8 \
-                             --global-batch-size 64 \
                              --enable-grad-ckpt \
 
 date
