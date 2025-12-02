@@ -44,9 +44,9 @@ The only hyperparameters that were tuned are:
 - For Full pytorch solution, **the selective activation checkpointing ratio**, adjusted according to the available GPU memory
 |    sAC ratio    | A100-80GB | H100-80GB | GB200-186GB |
 |-----------------|-----------|-----------|-------------|
-|  Qwen2.5-14B    | 1/2 | 1/2 | 0   |
-|  Qwen2.5-32B    | 3/4 | 3/4 | 0   |
-|  Qwen2.5-72B    | 1   | 1   | 1/2 |
+|  Qwen2.5-14B    | 1/2       | 1/2       | 0           |
+|  Qwen2.5-32B    | 3/4       | 3/4       | 0           |
+|  Qwen2.5-72B    | 1         | 1         | 1/2         |
 
 
 - For NeMo solution, **The tensor parallelism dimension**, chosen based on the number of GPUs per compute node
