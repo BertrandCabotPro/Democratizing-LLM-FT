@@ -140,7 +140,7 @@ sbatch slurm/DALIA_NeMo_FSDP_TP_32B.slurm
 ```
 
 ## Poster
-![poster](doc/images/Posterv1.png)
+![poster](doc/images/Posterv14.png)
 
 ----
 
